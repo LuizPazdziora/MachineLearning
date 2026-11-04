@@ -1,8 +1,10 @@
-## Avaliação do Modelo KNN – Telco Customer Churn
+# KNN (K-Nearest Neighbors)
+
+## Avaliação do modelo KNN – Telco Customer Churn
 
 - **Algoritmo:** K-Nearest Neighbors (KNN)  
 - **Parâmetros principais:** `k = 5`, distância Euclidiana, dados padronizados (`StandardScaler`)  
-- **Base:** Customer Churn (clientes de telecom)
+- **Base:** Telco Customer Churn, divisão 80/20 estratificada (`random_state=42`)
 
 ### Desempenho global
 
@@ -68,4 +70,4 @@ Interpretação:
 ![Matriz de confusão](cm-knn-churn.svg)
 
 === "pca-decision-boundary"  
-![pca-decision-boundary](knn-pca-decision-boundary.svg)
+![Fronteira de decisão do KNN após PCA](knn-pca-decision-boundary.png)

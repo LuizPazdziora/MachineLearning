@@ -1,125 +1,63 @@
-## 1) Contexto:
-Foi treinado um SVM com kernel RBF para classificar clientes em churn (1) e non-churn (0)
-a partir da base Telco Customer Churn preprocessada. A avaliação foi realizada em conjunto
-de teste com 1.409 registros.
+# SVM (Support Vector Machine)
 
-## 2) Resultados numéricos:
-Matriz_de_Confusao: "[760 275], [86 288]"
+## Contexto
 
-Detalhamento:
+Foi treinado um **SVM com kernel RBF** para classificar clientes em churn (1) e não churn (0) a partir da base pré-processada, com padronização (`StandardScaler`), divisão 80/20 estratificada e `class_weight="balanced"` para compensar o desbalanceamento das classes. A avaliação usa **1.409 clientes** de teste.
 
-TN (0→0): 760
+## Resultados
 
-FP (0→1): 275
+**Matriz de confusão**
 
-FN (1→0): 86
+| | Previsto: não churn | Previsto: churn |
+| --- | --- | --- |
+| **Real: não churn** | 760 (VN) | 275 (FP) |
+| **Real: churn** | 86 (FN) | 288 (VP) |
 
-TP (1→1): 288
+**Métricas por classe**
 
-Classification_Report:
+| Classe | Precisão | Recall | F1 | Suporte |
+| --- | --- | --- | --- | --- |
+| 0 – não churn | 0,90 | 0,73 | 0,81 | 1035 |
+| 1 – churn | 0,51 | **0,77** | 0,61 | 374 |
+| Média macro | 0,70 | 0,75 | 0,71 | 1409 |
+| Média ponderada | 0,80 | 0,74 | 0,76 | 1409 |
 
-Classe_0_nao_churn:
+**Métricas globais:** acurácia **0,744** · ROC-AUC **0,818**
 
-Precision: 0.90
-Recall: 0.73
-F1_score: 0.81
-Support: 1035
+## Interpretação
 
-Classe_1_churn:
+- **Recall de churn = 0,77:** o modelo identifica 77% dos clientes que realmente cancelam — bom para retenção.
+- **Precisão de churn = 0,51:** metade dos clientes sinalizados não cancelaria, o que gera custo com ações mal direcionadas (275 falsos positivos).
+- **ROC-AUC = 0,82:** boa capacidade de ordenar clientes por risco.
+- A acurácia (0,74) não é a métrica principal, porque a base é desbalanceada (≈ 26% de churn).
 
-Precision: 0.51
-Recall: 0.77
-F1_score: 0.61
-Support: 374
+## Avaliação crítica
 
-Accuracy_global:
+**Pontos fortes**
 
-Valor: 0.74
-Total_amostras: 1409
+- Alta taxa de detecção de churners.
+- ROC-AUC consistente para ranqueamento de risco.
+- O kernel RBF captura relações não lineares.
 
-Macro_avg:
+**Limitações**
 
-Precision: 0.70
-Recall: 0.75
-F1_score: 0.71
-
-Weighted_avg:
-
-Precision: 0.80
-Recall: 0.74
-F1_score: 0.76
-
-Metricas_globais:
-
-Acuracia: 0.7438
-
-ROC_AUC: 0.8178
-
-## 3) Interpretação das métricas:
-Foco_na_classe_de_negocio_Churn_1:
-Recall: 0.77
-interpretacao: >
-O modelo captura 77% dos clientes que realmente cancelam,
-indicando bom desempenho para retenção.
-
-Precision: 0.51
-interpretacao: >
-Entre os clientes classificados como churn, apenas 51% realmente cancelaram,
-indicando alto custo de falso positivo.
-
-F1_score: 0.61
-interpretacao: >
-Há equilíbrio razoável entre recall e precision, com viés intencional para recall.
-
-Qualidade_global:
-
-ROC_AUC: 0.8178
-interpretacao: >
-Demonstra boa capacidade de separação entre churners e não churners.
-
-Accuracy: 0.74
-interpretacao: >
-Adequada, porém não é a principal métrica devido ao leve desbalanceamento da base.
-
-Leitura_da_matriz_de_confusao:
-Falsos_positivos: 275
-impacto: >
-Geração de custo financeiro por ações de retenção mal direcionadas.
-
-Falsos_negativos: 86
-impacto: >
-Perda potencial de clientes que o modelo não conseguiu identificar.
-
-## 4) Avaliação crítica:
-Pontos_fortes:
-- Alta taxa de detecção de churners (recall elevado).
-- ROC-AUC indica modelo consistente para ranqueamento de risco.
-- SVM com kernel RBF captura padrões não lineares relevantes.
-
-Limitacoes:
 - Precisão moderada na classe positiva.
 - Probabilidades podem exigir calibração.
-- Ausência de tuning de hiperparâmetros.
+- Hiperparâmetros (`C`, `gamma`) não foram otimizados.
 
-## 5) Recomendações práticas:
-Acoes_sugeridas:
+## Próximos passos
 
-- Ajustar limiar de decisão para reduzir falsos positivos.
-- Aplicar GridSearchCV para otimizar C e gamma.
-- Calibrar probabilidades com CalibratedClassifierCV.
-- Realizar análise de custo-benefício entre FP e FN.
-- Comparar com modelos baseline como regressão logística e Random Forest.
+- Ajustar o limiar de decisão conforme o custo de FP × FN.
+- `GridSearchCV` para `C` e `gamma`.
+- Calibrar probabilidades com `CalibratedClassifierCV`.
+- Comparar com regressão logística, Random Forest e gradient boosting.
 
-## 6) Conclusão:
+## Conclusão
 
-O SVM com kernel RBF apresentou bom poder discriminatório (ROC-AUC ≈ 0.82) e alto recall
-para churn, sendo adequado como filtro de risco para ações de retenção. No entanto,
-a precisão moderada indica necessidade de tuning e ajuste de limiar para reduzir custos
-com falso positivo e maximizar o retorno das campanhas.
+O SVM com kernel RBF teve o melhor equilíbrio entre os modelos supervisionados do estudo para a classe churn (recall 0,77, ROC-AUC ≈ 0,82), sendo adequado como **filtro de risco** para campanhas de retenção, desde que o limiar seja ajustado para reduzir falsos positivos.
 
-=== "Plt"
-![SVMplt](SVMplt.svg)
+=== "Fronteiras por kernel (PCA 2D)"
+    ![SVM em 2 componentes principais](SVMplt.png)
 
-
-=== "Curva-ROC-SVM"
-![Curva-ROC-SVM](Curva-ROC-SVM.png)
+=== "Curva ROC"
+    ![Curva ROC do SVM](Curva-ROC-SVM.png)

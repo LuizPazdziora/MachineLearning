@@ -17,7 +17,7 @@ from sklearn.metrics import (
 # 1. Carregar base
  
 
-url = "https://raw.githubusercontent.com/LuizPazdziora/MachineLearning/refs/heads/main/Customer-Churn-preprocessed.csv"
+url = "data/Customer-Churn-preprocessed.csv"
 df = pd.read_csv(url)
 
 target_col = "Churn"
@@ -90,4 +90,5 @@ RocCurveDisplay.from_predictions(y_test, y_proba)
 plt.title("Curva ROC – SVM (Churn)")
 plt.grid(True, linestyle="--", alpha=0.4)
 plt.tight_layout()
-plt.show()
+plt.savefig("docs/roteiro4/Curva-ROC-SVM.png", dpi=100)
+plt.close()

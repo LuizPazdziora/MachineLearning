@@ -143,16 +143,11 @@ def prepare_churn_base(csv_in: str | Path) -> pd.DataFrame:
 # -------------------------------------------------------------------
 if __name__ == "__main__":
     # Caminho de entrada: base original
-    INPUT_CSV = (
-        "C:/Users/lfpaz/OneDrive - ESPM/"
-        "Sistema de Informação/SI4/MachineLearning/Customer-Churn.csv"
-    )
+    ROOT = Path(__file__).resolve().parents[1]
+    INPUT_CSV = ROOT / "data" / "Customer-Churn.csv"
 
     # Caminho de saída: base já limpa e codificada
-    OUTPUT_CSV = (
-        "C:/Users/lfpaz/OneDrive - ESPM/"
-        "Sistema de Informação/SI4/MachineLearning/Customer-Churn-preprocessed.csv"
-    )
+    OUTPUT_CSV = ROOT / "data" / "Customer-Churn-preprocessed.csv"
 
     df_preprocessed = prepare_churn_base(INPUT_CSV)
 

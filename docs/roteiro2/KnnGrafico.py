@@ -13,10 +13,7 @@ from sklearn.metrics import accuracy_score
 # -------------------------------------------------------------------
 # 1) Carregar base preprocessada
 # -------------------------------------------------------------------
-df = pd.read_csv(
-    "C:/Users/lfpaz/OneDrive - ESPM/"
-    "Sistema de Informação/SI4/MachineLearning/Customer-Churn-preprocessed.csv"
-)
+df = pd.read_csv("data/Customer-Churn-preprocessed.csv")  # execute a partir da raiz do repositório
 
 X = df.drop(columns=["Churn"])
 y = df["Churn"]
@@ -88,6 +85,5 @@ plt.xlabel("Componente Principal 1 (PCA)")
 plt.ylabel("Componente Principal 2 (PCA)")
 plt.title("KNN Decision Boundary (Customer Churn após PCA)")
 
-plt.savefig("C:/Users/lfpaz/OneDrive - ESPM/"
-    "Sistema de Informação/SI4/MachineLearning/knn-pca-decision-boundary.svg", format="svg", transparent=True)
+plt.savefig("docs/roteiro2/knn-pca-decision-boundary.png", dpi=80, bbox_inches="tight")
 plt.close()

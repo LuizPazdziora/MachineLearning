@@ -6,13 +6,12 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 from sklearn.inspection import DecisionBoundaryDisplay
-from io import StringIO
 
 # ============================================================
 # 1. Carregar a base de churn preprocessada
 # ============================================================
 
-url = "https://raw.githubusercontent.com/LuizPazdziora/MachineLearning/refs/heads/main/Customer-Churn-preprocessed.csv"
+url = "data/Customer-Churn-preprocessed.csv"
 df = pd.read_csv(url)
 
 target_col = "Churn"
@@ -86,15 +85,9 @@ fig.suptitle("Fronteiras de decisão – SVM em 2 PCs (Customer Churn)", y=1.02)
 plt.tight_layout()
 
 # ============================================================
-# 4. Exportar como SVG com fundo transparente
+# 4. Exportar a figura (execute a partir da raiz do repositório)
 # ============================================================
 
-buffer = StringIO()
-plt.savefig(buffer, format="svg", transparent=True)
-svg_data = buffer.getvalue()
-
-# Gravar SVG em arquivo
-with open("SVMplt.svg", "w", encoding="utf-8") as f:
-    f.write(svg_data)
+plt.savefig("docs/roteiro4/SVMplt.png", dpi=100, bbox_inches="tight")
 
 plt.close()

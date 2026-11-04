@@ -1,268 +1,113 @@
+# Árvore de Decisão
+
 ## Objetivo
 
-O dataset Customer Churn – reúne dados de clientes de uma operadora de telecom com o objetivo: prever se o cliente vai cancelar (Churn) ou permanecer.
+A base **Telco Customer Churn** reúne dados de 7.043 clientes de uma operadora de telecom. O objetivo é **prever se o cliente vai cancelar (churn) ou permanecer**.
 
+## Dicionário de dados
 
-## Descrição das colunas (dicionário de dados)
-customerID: ID do cliente
+| Coluna | Descrição |
+| --- | --- |
+| `customerID` | ID do cliente |
+| `gender` | Gênero do cliente (feminino, masculino) |
+| `SeniorCitizen` | Se o cliente é idoso ou não (1, 0) |
+| `Partner` | Se o cliente tem cônjuge/parceiro (Sim, Não) |
+| `Dependents` | Se o cliente possui dependentes (Sim, Não) |
+| `tenure` | Número de meses que o cliente permaneceu na empresa |
+| `PhoneService` | Se o cliente possui serviço de telefonia (Sim, Não) |
+| `MultipleLines` | Se o cliente possui múltiplas linhas (Sim, Não, Sem serviço de telefonia) |
+| `InternetService` | Provedor de internet do cliente (DSL, Fibra óptica, Sem internet) |
+| `OnlineSecurity` | Se o cliente possui segurança online (Sim, Não, Sem serviço de internet) |
+| `OnlineBackup` | Se o cliente possui backup online (Sim, Não, Sem serviço de internet) |
+| `DeviceProtection` | Se o cliente possui proteção de dispositivos (Sim, Não, Sem serviço de internet) |
+| `TechSupport` | Se o cliente possui suporte técnico (Sim, Não, Sem serviço de internet) |
+| `StreamingTV` | Se o cliente possui streaming de TV (Sim, Não, Sem serviço de internet) |
+| `StreamingMovies` | Se o cliente possui streaming de filmes (Sim, Não, Sem serviço de internet) |
+| `Contract` | Tipo de contrato do cliente (Mês a mês, Um ano, Dois anos) |
+| `PaperlessBilling` | Se o cliente utiliza fatura digital (Sim, Não) |
+| `PaymentMethod` | Método de pagamento do cliente (Cheque eletrônico, Cheque enviado, Transferência bancária — automática, Cartão de crédito — automático) |
+| `MonthlyCharges` | Valor cobrado mensalmente do cliente |
+| `TotalCharges` | Valor total cobrado do cliente |
+| `Churn` | Se o cliente cancelou (Sim ou Não) |
 
-Gender: Gênero do cliente (feminino, masculino)
+## Pré-processamento
 
-SeniorCitizen: Se o cliente é idoso ou não (1, 0)
+O pré-processamento fica centralizado em [`preprocess/prep.py`](https://github.com/LuizPazdziora/MachineLearning/blob/main/preprocess/prep.py) e é reutilizado por todos os roteiros:
 
+1. **Remoção do identificador** `customerID`.
+2. **Padronização de tipos:** `TotalCharges` chega como texto (com espaços em branco para clientes novos) e é convertido para numérico.
+3. **Valores faltantes:** numéricos (`tenure`, `MonthlyCharges`, `TotalCharges`) recebem a **mediana**; categóricos recebem a **moda**.
+4. **Codificação:** variáveis categóricas (incluindo `Churn`) são convertidas com `LabelEncoder`.
 
-Partner: Se o cliente tem cônjuge/parceiro (Sim, Não)
+Amostra de 10 clientes após o pré-processamento:
 
-Dependents: Se o cliente possui dependentes (Sim, Não)
+``` python exec="on" html="0"
+import sys
+sys.path.insert(0, "preprocess")
 
-Tenure: Número de meses que o cliente permaneceu na empresa
-
-PhoneService: Se o cliente possui serviço de telefonia (Sim, Não)
-
-MultipleLines: Se o cliente possui múltiplas linhas (Sim, Não, Sem serviço de telefonia)
-
-InternetService: Provedor de internet do cliente (DSL, Fibra óptica, Sem internet)
-
-OnlineSecurity: Se o cliente possui segurança online (Sim, Não, Sem serviço de internet)
-
-OnlineBackup: Se o cliente possui backup online (Sim, Não, Sem serviço de internet)
-
-DeviceProtection: Se o cliente possui proteção de dispositivos (Sim, Não, Sem serviço de internet)
-
-TechSupport: Se o cliente possui suporte técnico (Sim, Não, Sem serviço de internet)
-
-StreamingTV: Se o cliente possui streaming de TV (Sim, Não, Sem serviço de internet)
-
-StreamingMovies: Se o cliente possui streaming de filmes (Sim, Não, Sem serviço de internet)
-
-Contract: Tipo de contrato do cliente (Mês a mês, Um ano, Dois anos)
-
-PaperlessBilling: Se o cliente utiliza fatura digital (Sim, Não)
-
-PaymentMethod: Método de pagamento do cliente (Cheque eletrônico, Cheque enviado, Transferência bancária — automática, Cartão de crédito — automático)
-
-MonthlyCharges: Valor cobrado mensalmente do cliente
-
-TotalCharges: Valor total cobrado do cliente
-
-Churn: Se o cliente cancelou (Sim ou Não)
-
-
-
-## Pré Processamento
-
-
-1) padronização de tipos
-
-Normalização de TotalCharges para numérico
-
-2) Tratamento de valores faltantes
-
-Numéricos (tenure, MonthlyCharges, TotalCharges): imputação pela mediana.
-
-Categóricos (gender, Partner, Dependents, PhoneService, MultipleLines, InternetService,
-OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport, StreamingTV, StreamingMovies,
-Contract, PaperlessBilling, PaymentMethod, Churn): imputação pela moda (valor mais frequente).
-
-``` python  exec='on' html='0'
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from prep import clean_churn_df, encode_categorical
 
-def preprocess(df):
-    
-    df['gender'].fillna(df['gender'].mode(), inplace=True)
-    df['SeniorCitizen'].fillna(df['SeniorCitizen'].mode(), inplace=True)
-    df['Partner'].fillna(df['Partner'].mode(), inplace=True)
-    df['Dependents'].fillna(df['Dependents'].mode(), inplace=True)
-    df['tenure'].fillna(df['tenure'].mode()[0], inplace=True)
-    df['PhoneService'].fillna(df['PhoneService'].mode(), inplace=True)
-    df['MultipleLines'].fillna(df['MultipleLines'].mode(), inplace=True)
-    df['InternetService'].fillna(df['InternetService'].mode(), inplace=True)
-    df['OnlineSecurity'].fillna(df['OnlineSecurity'].mode(), inplace=True)
-    df['OnlineBackup'].fillna(df['OnlineBackup'].mode(), inplace=True)
-    df['DeviceProtection'].fillna(df['DeviceProtection'].mode()[0], inplace=True)
-    df['TechSupport'].fillna(df['TechSupport'].mode()[0], inplace=True)
-    df['StreamingTV'].fillna(df['StreamingTV'].mode()[0], inplace=True)
-    df['StreamingMovies'].fillna(df['StreamingMovies'].mode()[0], inplace=True)
-    df['Contract'].fillna(df['Contract'].mode()[0], inplace=True)
-    df['PaperlessBilling'].fillna(df['PaperlessBilling'].mode()[0], inplace=True)
-    df['PaymentMethod'].fillna(df['PaymentMethod'].mode()[0], inplace=True)
-    df['MonthlyCharges'].fillna(df['MonthlyCharges'].mode()[0], inplace=True)
-    df['TotalCharges'].fillna(df['TotalCharges'].mode()[0], inplace=True)
-    df['Churn'].fillna(df['Churn'].mode()[0], inplace=True)
+df_raw = pd.read_csv("data/Customer-Churn.csv")
+df = encode_categorical(clean_churn_df(df_raw))
 
-
-
-
-    #Label encoder para preparar variaveis categoricas para o modelo
-
-    label_encoder = LabelEncoder()
-    df['gender'] = label_encoder.fit_transform(df['gender'])
-    df['Partner'] = label_encoder.fit_transform(df['Partner'])
-    df['Dependents'] = label_encoder.fit_transform(df['Dependents'])
-    df['PhoneService'] = label_encoder.fit_transform(df['PhoneService'])
-    df['MultipleLines'] = label_encoder.fit_transform(df['MultipleLines'])
-    df['InternetService'] = label_encoder.fit_transform(df['InternetService'])
-    df['OnlineSecurity'] = label_encoder.fit_transform(df['OnlineSecurity'])
-    df['OnlineBackup'] = label_encoder.fit_transform(df['OnlineBackup'])
-    df['DeviceProtection'] = label_encoder.fit_transform(df['DeviceProtection'])
-    df['TechSupport'] = label_encoder.fit_transform(df['TechSupport'])
-    df['StreamingTV'] = label_encoder.fit_transform(df['StreamingTV'])
-    df['StreamingMovies'] = label_encoder.fit_transform(df['StreamingMovies'])
-    df['Contract'] = label_encoder.fit_transform(df['Contract'])
-    df['PaperlessBilling'] = label_encoder.fit_transform(df['PaperlessBilling'])
-    df['PaymentMethod'] = label_encoder.fit_transform(df['PaymentMethod'])
-
-
-
-    # Tratamento de valores missmatch na coluna TotalCharges
-    s = df['TotalCharges'].astype(str).str.strip().replace({"2283.3"})
-    df['TotalCharges'] = pd.to_numeric(s, errors='coerce').astype('Float64')
-
-    return df
-
-url = "https://raw.githubusercontent.com/LuizPazdziora/documentation.template/refs/heads/main/Customer-Churn.csv"
-df = pd.read_csv(url)
-df = df.sample(n=10)
-df = preprocess(df)
-
-print(df.to_markdown(index=False))
+print(df.sample(n=10, random_state=42).to_markdown(index=False))
 ```
 
-## Divisão de dados
+## Divisão dos dados e treinamento
 
-Os dados foram divididos em 70% para treino e 30% para validação, com o objetivo de evitar overfitting e obter uma estimativa mais fiel de desempenho.
+Os dados foram divididos em **70% treino** e **30% validação** (`random_state=42`). Foram treinadas duas árvores: uma **sem limite de profundidade** e outra com **`max_depth=5`**, para comparar o efeito do *overfitting*.
 
 ``` python exec="on" html="on"
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from sklearn import tree
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, classification_report
 from io import StringIO
+from sklearn import tree
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import train_test_split
 
+df = pd.read_csv("data/Customer-Churn-preprocessed.csv")
+X = df.drop(columns=["Churn"])
+y = df["Churn"]
 
-def preprocess(df):
-    
-    df['gender'].fillna(df['gender'].mode(), inplace=True)
-    df['SeniorCitizen'].fillna(df['SeniorCitizen'].mode(), inplace=True)
-    df['Partner'].fillna(df['Partner'].mode(), inplace=True)
-    df['Dependents'].fillna(df['Dependents'].mode(), inplace=True)
-    df['tenure'].fillna(df['tenure'].mode()[0], inplace=True)
-    df['PhoneService'].fillna(df['PhoneService'].mode(), inplace=True)
-    df['MultipleLines'].fillna(df['MultipleLines'].mode(), inplace=True)
-    df['InternetService'].fillna(df['InternetService'].mode(), inplace=True)
-    df['OnlineSecurity'].fillna(df['OnlineSecurity'].mode(), inplace=True)
-    df['OnlineBackup'].fillna(df['OnlineBackup'].mode(), inplace=True)
-    df['DeviceProtection'].fillna(df['DeviceProtection'].mode()[0], inplace=True)
-    df['TechSupport'].fillna(df['TechSupport'].mode()[0], inplace=True)
-    df['StreamingTV'].fillna(df['StreamingTV'].mode()[0], inplace=True)
-    df['StreamingMovies'].fillna(df['StreamingMovies'].mode()[0], inplace=True)
-    df['Contract'].fillna(df['Contract'].mode()[0], inplace=True)
-    df['PaperlessBilling'].fillna(df['PaperlessBilling'].mode()[0], inplace=True)
-    df['PaymentMethod'].fillna(df['PaymentMethod'].mode()[0], inplace=True)
-    df['MonthlyCharges'].fillna(df['MonthlyCharges'].mode()[0], inplace=True)
-    df['TotalCharges'].fillna(df['TotalCharges'].mode()[0], inplace=True)
-    df['Churn'].fillna(df['Churn'].mode()[0], inplace=True)
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
+resultados = []
+for profundidade in [None, 5]:
+    modelo = tree.DecisionTreeClassifier(max_depth=profundidade, random_state=42)
+    modelo.fit(x_train, y_train)
+    pred = modelo.predict(x_test)
+    rel = classification_report(y_test, pred, output_dict=True)
+    resultados.append({
+        "max_depth": "sem limite" if profundidade is None else profundidade,
+        "acurácia": round(accuracy_score(y_test, pred), 3),
+        "recall churn": round(rel["1"]["recall"], 3),
+        "F1 churn": round(rel["1"]["f1-score"], 3),
+    })
 
-    # Corrigir TotalCharges string para numérico
-    s = df['TotalCharges'].astype(str).str.strip().replace({"2283.3"})
-    df['TotalCharges'] = pd.to_numeric(s, errors='coerce').astype('Float64')
+print(pd.DataFrame(resultados).to_html(index=False))
 
-    label_encoder = LabelEncoder()
-    df['gender'] = label_encoder.fit_transform(df['gender'])
-    df['Partner'] = label_encoder.fit_transform(df['Partner'])
-    df['Dependents'] = label_encoder.fit_transform(df['Dependents'])
-    df['PhoneService'] = label_encoder.fit_transform(df['PhoneService'])
-    df['MultipleLines'] = label_encoder.fit_transform(df['MultipleLines'])
-    df['InternetService'] = label_encoder.fit_transform(df['InternetService'])
-    df['OnlineSecurity'] = label_encoder.fit_transform(df['OnlineSecurity'])
-    df['OnlineBackup'] = label_encoder.fit_transform(df['OnlineBackup'])
-    df['DeviceProtection'] = label_encoder.fit_transform(df['DeviceProtection'])
-    df['TechSupport'] = label_encoder.fit_transform(df['TechSupport'])
-    df['StreamingTV'] = label_encoder.fit_transform(df['StreamingTV'])
-    df['StreamingMovies'] = label_encoder.fit_transform(df['StreamingMovies'])
-    df['Contract'] = label_encoder.fit_transform(df['Contract'])
-    df['PaperlessBilling'] = label_encoder.fit_transform(df['PaperlessBilling'])
-    df['PaymentMethod'] = label_encoder.fit_transform(df['PaymentMethod'])
+importancias = (
+    pd.DataFrame({"Variável": X.columns, "Importância": modelo.feature_importances_})
+    .sort_values("Importância", ascending=False)
+    .head(8)
+)
+print("<h4>Variáveis mais importantes (max_depth=5)</h4>")
+print(importancias.to_html(index=False, float_format="%.3f"))
 
-    # Select features (suas colunas)
-    features = [
-        'gender', 'SeniorCitizen', 'Partner', 'Dependents', 'tenure',
-        'PhoneService', 'MultipleLines', 'InternetService', 'OnlineSecurity',
-        'OnlineBackup', 'DeviceProtection', 'TechSupport', 'StreamingTV',
-        'StreamingMovies', 'Contract', 'PaperlessBilling', 'PaymentMethod',
-        'MonthlyCharges', 'TotalCharges', 'Churn'
-    ]
-
-    return df[features]
-
-url = "https://raw.githubusercontent.com/LuizPazdziora/documentation.template/refs/heads/main/Customer-Churn.csv"
-df = pd.read_csv(url)
-
-
-# Carregar o conjunto de dados
-
-df = preprocess(df)
-
-
-cols = [
-        'gender', 'SeniorCitizen', 'Partner', 'Dependents', 'tenure',
-        'PhoneService', 'MultipleLines', 'InternetService', 'OnlineSecurity',
-        'OnlineBackup', 'DeviceProtection', 'TechSupport', 'StreamingTV',
-        'StreamingMovies', 'Contract', 'PaperlessBilling', 'PaymentMethod',
-        'MonthlyCharges', 'TotalCharges'
-    ]
-x = df[cols]
-y = df['Churn']
-
-# Dividir os dados em conjuntos de treinamento e teste
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
-
-
-# Criar e treinar o modelo de árvore de decisão
-classifier = tree.DecisionTreeClassifier()
-classifier.fit(x_train, y_train)
-
-
-# Optional: Print feature importances
-feature_importance = pd.DataFrame({
-    'Feature': [ 'gender', 'SeniorCitizen', 'Partner', 'Dependents', 'tenure',
-        'PhoneService', 'MultipleLines', 'InternetService', 'OnlineSecurity',
-        'OnlineBackup', 'DeviceProtection', 'TechSupport', 'StreamingTV',
-        'StreamingMovies', 'Contract', 'PaperlessBilling', 'PaymentMethod',
-        'MonthlyCharges', 'TotalCharges'],
-    'Importance': classifier.feature_importances_
-})
-print("<br>Feature Importances:")
-print(feature_importance.sort_values(by='Importance', ascending=False).to_html())
-
-# Avaliar o modelo
-accuracy = classifier.score(x_test, y_test)
-print(f"Accuracy: {accuracy:.2f}")
-tree.plot_tree(classifier)
-
-# Para imprimir na página HTML
+plt.figure(figsize=(14, 6))
+tree.plot_tree(modelo, max_depth=2, feature_names=list(X.columns), class_names=["Não churn", "Churn"], filled=True, fontsize=8)
 buffer = StringIO()
-plt.savefig(buffer, format="svg")
+plt.savefig(buffer, format="svg", transparent=True, bbox_inches="tight")
+plt.close()
 print(buffer.getvalue())
-
 ```
-
-
-
-
-
 
 ## Avaliação do modelo
 
-O modelo teve accuracy de 74% no conjunto de validação. Para um accuracy maior é necessario análise das variáveis com maior correlação para serem utilizadas no treinamento do modelo
-
-
+- A árvore **sem limite de profundidade** decora o conjunto de treino e chega a cerca de **73%** de acurácia na validação.
+- Limitando a profundidade em **5**, a acurácia sobe para cerca de **79%**: o modelo generaliza melhor.
+- Mesmo assim, o *recall* da classe churn fica abaixo de 50%, ou seja, a árvore ainda deixa passar muitos clientes que cancelam. Tipo de contrato, segurança online e tempo de casa (`tenure`) são as variáveis mais relevantes.
+- Próximos passos: balanceamento de classes, ajuste de hiperparâmetros com validação cruzada e comparação com os demais modelos (ver [Conclusões](../projeto/main.md)).
