@@ -1,10 +1,12 @@
-site_name: Machine Learning
+site_name: Machine Learning Churn em Telecom
 site_url: https://luizpazdziora.github.io/MachineLearning/
 repo_url: https://github.com/LuizPazdziora/MachineLearning
 repo_name: github/LuizPazdziora/MachineLearning
 
 theme:
   name: material
+
+language: pt-BR
   palette:
     # primary: grey
     # Light mode
@@ -109,7 +111,7 @@ plugins:
       enable_creation_date: true
   - git-authors
   - git-committers:
-      repository: hsandmann/hsandmann.github.com
+      repository: LuizPazdziora/MachineLearning
       branch: main
   - search
   - badges
@@ -124,18 +126,16 @@ plugins:
         - ">"
 
 extra_javascript:
-  - https://unpkg.com/mathjax/es5/tex-mml-chtml.js
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
   - https://fastly.jsdelivr.net/npm/jquery/dist/jquery.min.js
   - https://fastly.jsdelivr.net/npm/echarts/dist/echarts.min.js
 
 nav:
   - Home: index.md
-  - This documentation: ./thisdocumentation/main.md
+ 
   - Roteiros:
     - Árvore de decisão: ./roteiro1/main.md
     - KNN: ./roteiro2/main.md
     - K-Means: ./roteiro3/main.md
     - SVM: ./roteiro4/main.md
-  - Projeto: ./projeto/main.md
+  - Conclusões: ./projeto/main.md
