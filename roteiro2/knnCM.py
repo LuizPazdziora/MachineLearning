@@ -10,15 +10,11 @@ from sklearn.metrics import confusion_matrix
 
 
 # -------------------------------------------------------------------
-# 1) Configuração de caminhos
+# 1) Configuração de caminhos (execute a partir da raiz do repositório)
 # -------------------------------------------------------------------
-DATA_PATH = Path(
-    "C:/Users/lfpaz/OneDrive - ESPM/"
-    "Sistema de Informação/SI4/MachineLearning/Customer-Churn-preprocessed.csv"
-)
+DATA_PATH = Path("data/Customer-Churn-preprocessed.csv")
 
-OUTPUT_DIR = Path("C:/Users/lfpaz/OneDrive - ESPM/"
-    "Sistema de Informação/SI4/MachineLearning/")
+OUTPUT_DIR = Path("docs/roteiro2")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)  # cria pasta se não existir
 
 # Nomes dos arquivos

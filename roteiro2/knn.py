@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score
 # 1) Carregar base já preprocessada
 # -------------------------------------------------------------------
 df = pd.read_csv(
-    "https://raw.githubusercontent.com/LuizPazdziora/MachineLearning/refs/heads/main/Customer-Churn-preprocessed.csv"
+    "data/Customer-Churn-preprocessed.csv"
 )
 
 # -------------------------------------------------------------------

@@ -5,11 +5,10 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
-from io import StringIO
 
 # Carregar base real
 df = pd.read_csv(
-    "https://raw.githubusercontent.com/LuizPazdziora/MachineLearning/refs/heads/main/Customer-Churn-preprocessed.csv"
+    "data/Customer-Churn-preprocessed.csv"
 )
 
 
@@ -60,13 +59,7 @@ plt.ylabel("Componente Principal 2")
 plt.legend()
 plt.grid(True, linestyle="--", alpha=0.3)
 
-# Gerar SVG em memória
-buffer = StringIO()
-plt.savefig(buffer, format="svg", transparent=True)
-svg_data = buffer.getvalue()
-
-# Gravar SVG em arquivo
-with open("kmeans_telco_churn.svg", "w", encoding="utf-8") as f:
-    f.write(svg_data)
+# Exportar a figura (execute a partir da raiz do repositório)
+plt.savefig("docs/roteiro3/kmeans_telco_churn.png", dpi=100, bbox_inches="tight")
 
 plt.close()
